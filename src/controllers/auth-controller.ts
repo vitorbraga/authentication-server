@@ -30,8 +30,8 @@ class AuthController {
             return;
         }
 
-        //Sing JWT, valid for 1 hour
-        const token = jwt.sign({ userId: user.id, username: user.email }, config.jwtSecret, { expiresIn: '1h' });
+        //Sing JWT, valid for 2 hours
+        const token = jwt.sign({ userId: user.id, email: user.email }, config.jwtSecret, { expiresIn: '2h' });
 
         //Send the jwt in the response
         res.send({ success: true, jwt: token });

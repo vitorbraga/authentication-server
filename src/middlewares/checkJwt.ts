@@ -4,7 +4,7 @@ import config from '../config/config';
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     //Get the jwt token from the head
-    const token = <string>req.headers['auth'];
+    const token = req.headers['auth'] as string;
     let jwtPayload;
   
     //Try to validate the token and get data
@@ -17,11 +17,11 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
         return;
     }
 
-    //The token is valid for 1 hour
+    //The token is valid for 2 hour
     //We want to send a new token on every request
     const { userId, email } = jwtPayload;
     const newToken = jwt.sign({ userId, email }, config.jwtSecret, {
-        expiresIn: '1h'
+        expiresIn: '2h'
     });
     res.setHeader('token', newToken);
 

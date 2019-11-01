@@ -15,7 +15,6 @@ export class User {
     firstName: string;
 
     @Column()
-    @Length(4, 100)
     lastName: string;
 
     @Column()

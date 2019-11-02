@@ -11,7 +11,7 @@ class AuthController {
         //Check if username and password are set
         let { username, password } = req.body;
         if (!(username && password)) {
-            res.status(400).send({ success: false, error: 'Missing credentials' });
+            res.status(400).send({ success: false, error: 'LOGIN_MISSING_CREDENTIALS' });
             return;
         }
 
@@ -21,12 +21,13 @@ class AuthController {
         try {
             user = await userRepository.findOneOrFail({ where: { email: username } });
         } catch (error) {
-            res.status(401).send();
+            res.status(401).send({ success: false, error: 'LOGIN_USER_NOT_FOUND' });
+            return;
         }
 
         //Check if encrypted password match
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-            res.status(401).send({ success: false, error: 'Email and password do not match.' });
+            res.status(401).send({ success: false, error: 'LOGIN_UNMATCHED_EMAIL_PWD' });
             return;
         }
 

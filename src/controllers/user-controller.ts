@@ -25,11 +25,11 @@ class UserController{
         const userRepository = getRepository(User);
         try {
             const user = await userRepository.findOneOrFail(id, {
-                select: ['id', 'email', 'role'] //We dont want to send the password on response
+                select: ['id', 'email', 'firstName', 'lastName', 'role', 'createdAt', 'updatedAt']
             });
-            res.json(user);
+            res.json({ success: true, user });
         } catch (error) {
-            res.status(404).send('User not found');
+            res.status(404).send({ success: false, error: 'USER_NOT_FOUND' });
         }
     };
 

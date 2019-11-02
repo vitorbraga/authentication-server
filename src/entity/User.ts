@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { Length, IsNotEmpty } from "class-validator";
+import { Length, IsNotEmpty, MinLength } from "class-validator";
 import * as bcrypt from "bcryptjs";
   
 @Entity()
@@ -18,7 +18,9 @@ export class User {
     lastName: string;
 
     @Column()
-    @Length(4, 100)
+    @MinLength(6, {
+        message: "REGISTER_PASSWORD_SIX_CHARS"
+    })
     password: string;
   
     @Column()

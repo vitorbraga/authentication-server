@@ -68,13 +68,12 @@ class AuthController {
         const passwordReset = new PasswordReset();
         passwordReset.token = token;
         passwordReset.user = user;
-
-        console.log('user.passwordResets', user.passwordResets);
-        user.passwordResets = user.passwordResets ? [...user.passwordResets, passwordReset] : [passwordReset];
-        const resultUser = await userRepository.save(user);
-        console.log('resultUser', resultUser);
+        const passwordResetRepository = getRepository(PasswordReset);
+        const resetCreated = await passwordResetRepository.save(passwordReset);
         
-        // send email
+        user.passwordResets = user.passwordResets ? [...user.passwordResets, resetCreated] : [resetCreated];
+        await userRepository.save(user);
+        
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
             subject: subjectTemplates.PASSWORD_RESET,
@@ -82,6 +81,7 @@ class AuthController {
         };
 
         res.status(200).send({ success: true });
+
         // TODO see to create thread or something
         sendEmail(emailOptions);
     }

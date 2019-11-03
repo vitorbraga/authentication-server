@@ -12,6 +12,6 @@ router.post('/change-password', [checkJwt], AuthController.changePassword);
 // Generate password recovery token
 router.post('/password-reset', [], AuthController.passwordReset);
 
-router.get('/check-password-token/:token', [], AuthController.checkPasswordToken);
+router.get('/check-password-token/:token/:userId', [], AuthController.checkPasswordToken);
 
 export default router;

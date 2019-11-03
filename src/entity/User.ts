@@ -35,7 +35,7 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
   
-    @OneToMany(type => PasswordReset, passwordReset => passwordReset.user, { eager: true })
+    @OneToMany(type => PasswordReset, passwordReset => passwordReset.user, { cascade: true, eager: true })
     passwordResets: PasswordReset[];
 
     hashPassword() {

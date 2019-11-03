@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { Length, IsNotEmpty, MinLength } from "class-validator";
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
+import { Length, IsNotEmpty, MinLength, IsEmail } from "class-validator";
 import * as bcrypt from "bcryptjs";
+import { PasswordReset } from "./PasswordReset";
   
 @Entity()
 @Unique(["email"])
@@ -9,6 +10,7 @@ export class User {
     id: number;
   
     @Column()
+    @IsEmail({}, { message: 'REGISTER_INVALID_EMAIL' })
     email: string;
   
     @Column()
@@ -18,9 +20,7 @@ export class User {
     lastName: string;
 
     @Column()
-    @MinLength(6, {
-        message: "REGISTER_PASSWORD_SIX_CHARS"
-    })
+    @MinLength(6, { message: "REGISTER_PASSWORD_SIX_CHARS" })
     password: string;
   
     @Column()
@@ -35,6 +35,9 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
   
+    @OneToMany(type => PasswordReset, passwordReset => passwordReset.user, { cascade: true })
+    passwordResets: PasswordReset[];
+
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);
     }

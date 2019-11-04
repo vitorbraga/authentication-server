@@ -15,6 +15,7 @@ export const checkRole = (roles: Array<string>) => {
             user = await userRepository.findOneOrFail(id);
         } catch (id) {
             res.status(401).send({ success: false, error: 'Could not find user from token.' });
+            return;
         }
 
         //Check if array of authorized roles includes the user's role

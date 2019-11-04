@@ -9,12 +9,13 @@ import { PasswordReset } from '../entity/PasswordReset';
 import { sendEmail, EmailOptions } from '../utils/email-sender';
 import { subjectTemplates, bodyTemplates } from '../utils/email-templates';
 import { encrypt, decrypt } from '../utils/encrypter';
+import { checkPasswordComplexity } from '../utils/validators';
 
 const PASSWORD_RESET_TOKEN_EXPIRATION_MS = 18000000; // 5 hours
 
 const createPasswordResetUrl = (token: string, userId: number): string => {
     const encryptedUserId = encrypt(userId.toString());
-    return `${process.env.SERVER_URL}/change-password?token=${token}&u=${encryptedUserId}`;
+    return `${process.env.APP_SERVER_URL}/change-password?token=${token}&u=${encryptedUserId}`;
 }
 
 class AuthController {
@@ -49,7 +50,7 @@ class AuthController {
         res.send({ success: true, jwt: token });
     };
 
-    static passwordReset = async (req: Request, res: Response) => {
+    static passwordRecoveryProcess = async (req: Request, res: Response) => {
         let { email } = req.body;
         if (!email) {
             res.status(400).send({ success: false, error: 'PASSWORD_RESET_MISSING_EMAIL' });
@@ -66,7 +67,6 @@ class AuthController {
         }
 
         const token = uuidv4();
-
         const passwordReset = new PasswordReset();
         passwordReset.token = token;
         passwordReset.user = user;
@@ -78,11 +78,90 @@ class AuthController {
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
             subject: subjectTemplates.PASSWORD_RESET,
-            body: bodyTemplates.PASSWORD_RESET.replace('{name}', user.firstName).replace('{url}', createPasswordResetUrl(token, user.id))
+            body: bodyTemplates.PASSWORD_RESET.replace('{name}', user.firstName)
+                .replace('{url}', createPasswordResetUrl(token, user.id))
         };
 
         res.status(200).send({ success: true });
         // TODO see to create thread or something
+        sendEmail(emailOptions);
+    }
+
+    static resetPassword = async (req: Request, res: Response) => {
+        let { newPassword, token, userId: encryptedUserId } = req.body;
+        if (!(newPassword && token && encryptedUserId)) {
+            res.status(400).send({ success: false, error: 'RESET_MISSING_DATA' });
+            return;
+        }
+
+        // Check if password satisfies the complexity rules
+        if (!checkPasswordComplexity(newPassword)) {
+            res.status(401).send({ success: false, error: 'REGISTER_PASSWORD_COMPLEXITY' });
+            return;
+        }
+
+        // Search in DB for the entity with token
+        const passwordResetRepository = getRepository(PasswordReset);
+        let passwordReset: PasswordReset;
+        try {
+            passwordReset = await passwordResetRepository.findOneOrFail({ where: { token }, relations: ['user'] });
+        } catch (error) {
+            res.status(401).send({ success: false, error: 'PASSWORD_RESET_USER_NOT_FOUND' });
+            return;
+        }
+
+        // Check if token is expired
+        if (passwordReset.createdAt.getTime() + PASSWORD_RESET_TOKEN_EXPIRATION_MS < Date.now()) {
+            res.status(401).send({ success: false, error: 'PASSWORD_TOKEN_EXPIRED' });
+            return;
+        }
+
+        // Check if decrypted userId matches with user.id from database
+        let decryptedUserId: string;
+        try {
+            decryptedUserId = decrypt(encryptedUserId);
+        } catch (error) {
+            res.status(401).send({ success: false, error: 'PASSWORD_RESET_BAD_USER_ID' });
+            return;
+        }
+
+        if (parseInt(decryptedUserId, 10) !== passwordReset.user.id) {
+            res.status(401).send({ success: false, error: 'PASSWORD_RESET_TOKEN_AND_ID_NOT_MATCH' });
+            return;
+        }
+
+        // Fetch user, change password
+        const userRepository = getRepository(User);
+        let user: User;
+        try {
+            user = await userRepository.findOneOrFail({ where: { id: decryptedUserId } });
+        } catch (error) {
+            res.status(401).send({ success: false, error: 'USER_NOT_FOUND' });
+            return;
+        }
+
+        // Set new password and check for errors
+        user.password = newPassword;
+        const errors = await validate(user);
+        if (errors.length > 0) {
+            res.status(500).send({ success: false, error: 'UNEXPECTED_ERROR' });
+            return;
+        }
+
+        //Hash the new password and save
+        user.hashPassword();
+        await userRepository.save(user);
+
+        res.status(200).send({ success: true });
+
+        // Send success email: password changed 
+        const emailOptions: EmailOptions = {
+            destinationEmail: user.email,
+            subject: subjectTemplates.PASSWORD_RESET_SUCCESS,
+            body: bodyTemplates.PASSWORD_RESET_SUCCESS.replace('{name}', user.firstName)
+                .replace('{url}', `${process.env.APP_SERVER_URL}/password-reset`)
+        };
+
         sendEmail(emailOptions);
     }
 
@@ -103,7 +182,7 @@ class AuthController {
         try {
             passwordReset = await passwordResetRepository.findOneOrFail({ where: { token }, relations: ['user'] });
         } catch (error) {
-            res.status(401).send({ success: false, error: 'PASSWORD_RESET_USER_NOT_FOUND' });
+            res.status(401).send({ success: false, error: 'PASSWORD_RESET_TOKEN_USER_NOT_FOUND' });
             return;
         }
 
@@ -138,6 +217,7 @@ class AuthController {
         const { oldPassword, newPassword } = req.body;
         if (!(oldPassword && newPassword)) {
             res.status(400).send();
+            return;
         }
 
         //Get user from the database
@@ -147,6 +227,7 @@ class AuthController {
             user = await userRepository.findOneOrFail(id);
         } catch (id) {
             res.status(401).send();
+            return;
         }
 
         //Check if old password matchs

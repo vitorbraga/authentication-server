@@ -6,7 +6,7 @@ export const encrypt = (textToEncrypt: string): string => {
     encryptedText += cipher.final('hex');
 
     return encryptedText;
-}
+};
 
 export const decrypt = (encryptedText: string): string => {
     const decipher = crypto.createDecipher('aes-128-cbc', process.env.ENCRYPT_SECRET);
@@ -14,4 +14,4 @@ export const decrypt = (encryptedText: string): string => {
     decryptedText += decipher.final('utf8');
 
     return decryptedText;
-}
+};

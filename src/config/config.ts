@@ -1,1 +1,1 @@
-export default { jwtSecret: "@QEGTUI" };
+export default { jwtSecret: '@QEGTUI' };

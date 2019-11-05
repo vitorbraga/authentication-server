@@ -11,4 +11,4 @@ export const bodyTemplates = {
     PASSWORD_RESET_SUCCESS:  '<p>Dear {name},<br>Your password has been changed. If you did not update your account, please tell us immediately. ' +
         'Submit a help request or email <a href="mailto:vitorcripto9@gmail.com">vitorcripto9@gmail.com</a>.</p>' +
         '<p>If you are having trouble accessing your account, <a href={url}>reset</a> your password</p><p>King regards.</p>'
-}
+};

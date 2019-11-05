@@ -16,18 +16,18 @@ const PASSWORD_RESET_TOKEN_EXPIRATION_MS = 18000000; // 5 hours
 const createPasswordResetUrl = (token: string, userId: number): string => {
     const encryptedUserId = encrypt(userId.toString());
     return `${process.env.APP_SERVER_URL}/change-password?token=${token}&u=${encryptedUserId}`;
-}
+};
 
 class AuthController {
     static login = async (req: Request, res: Response) => {
-        //Check if username and password are set
-        let { username, password } = req.body;
+        // Check if username and password are set
+        const { username, password } = req.body;
         if (!(username && password)) {
             res.status(400).send({ success: false, error: 'LOGIN_MISSING_CREDENTIALS' });
             return;
         }
 
-        //Get user from database
+        // Get user from database
         const userRepository = getRepository(User);
         let user: User;
         try {
@@ -37,21 +37,21 @@ class AuthController {
             return;
         }
 
-        //Check if encrypted password match
+        // Check if encrypted password match
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
             res.status(401).send({ success: false, error: 'LOGIN_UNMATCHED_EMAIL_PWD' });
             return;
         }
 
-        //Sing JWT, valid for 2 hours
+        // Sing JWT, valid for 2 hours
         const token = jwt.sign({ userId: user.id, email: user.email }, config.jwtSecret, { expiresIn: '2h' });
 
-        //Send the jwt in the response
+        // Send the jwt in the response
         res.send({ success: true, jwt: token });
-    };
+    }
 
     static passwordRecoveryProcess = async (req: Request, res: Response) => {
-        let { email } = req.body;
+        const { email } = req.body;
         if (!email) {
             res.status(400).send({ success: false, error: 'PASSWORD_RESET_MISSING_EMAIL' });
             return;
@@ -73,7 +73,7 @@ class AuthController {
 
         user.passwordResets = user.passwordResets ? [...user.passwordResets, passwordReset] : [passwordReset];
         await userRepository.save(user);
-        
+
         // send email
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
@@ -88,7 +88,7 @@ class AuthController {
     }
 
     static resetPassword = async (req: Request, res: Response) => {
-        let { newPassword, token, userId: encryptedUserId } = req.body;
+        const { newPassword, token, userId: encryptedUserId } = req.body;
         if (!(newPassword && token && encryptedUserId)) {
             res.status(400).send({ success: false, error: 'RESET_MISSING_DATA' });
             return;
@@ -148,13 +148,13 @@ class AuthController {
             return;
         }
 
-        //Hash the new password and save
+        // Hash the new password and save
         user.hashPassword();
         await userRepository.save(user);
 
         res.status(200).send({ success: true });
 
-        // Send success email: password changed 
+        // Send success email: password changed
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
             subject: subjectTemplates.PASSWORD_RESET_SUCCESS,
@@ -166,7 +166,7 @@ class AuthController {
     }
 
     static checkPasswordToken = async (req: Request, res: Response) => {
-        let { token, userId: encryptedUserId } = req.params;
+        const { token, userId: encryptedUserId } = req.params;
         if (!token) {
             res.status(400).send({ success: false, error: 'PASSWORD_TOKEN_REQUIRED' });
             return;
@@ -194,7 +194,7 @@ class AuthController {
             res.status(401).send({ success: false, error: 'PASSWORD_RESET_BAD_USER_ID' });
             return;
         }
-         
+
         if (parseInt(decryptedUserId, 10) !== passwordReset.user.id) {
             res.status(401).send({ success: false, error: 'PASSWORD_RESET_TOKEN_AND_ID_NOT_MATCH' });
             return;
@@ -208,19 +208,18 @@ class AuthController {
         res.status(200).send({ success: true });
     }
 
-
     static changePassword = async (req: Request, res: Response) => {
-        //Get ID from JWT
+        // Get ID from JWT
         const id = res.locals.jwtPayload.userId;
 
-        //Get parameters from the body
+        // Get parameters from the body
         const { oldPassword, newPassword } = req.body;
         if (!(oldPassword && newPassword)) {
             res.status(400).send();
             return;
         }
 
-        //Get user from the database
+        // Get user from the database
         const userRepository = getRepository(User);
         let user: User;
         try {
@@ -230,25 +229,25 @@ class AuthController {
             return;
         }
 
-        //Check if old password matchs
+        // Check if old password matchs
         if (!user.checkIfUnencryptedPasswordIsValid(oldPassword)) {
             res.status(401).send();
             return;
         }
 
-        //Validate de model (password lenght)
+        // Validate de model (password lenght)
         user.password = newPassword;
         const errors = await validate(user);
         if (errors.length > 0) {
             res.status(400).send(errors);
             return;
         }
-        //Hash the new password and save
+        // Hash the new password and save
         user.hashPassword();
         userRepository.save(user);
 
         res.status(204).send();
-    };
+    }
 }
 
 export default AuthController;

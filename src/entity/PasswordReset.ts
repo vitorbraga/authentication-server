@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, Unique } from "typeorm";
 import { User } from "./User";
   
 @Entity()
+@Unique(["token"])
 export class PasswordReset {
     @PrimaryGeneratedColumn()
     id: number;

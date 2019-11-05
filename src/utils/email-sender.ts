@@ -29,4 +29,4 @@ export const sendEmail = (emailOptions: EmailOptions) => {
             console.log('Email sent to ', emailOptions.destinationEmail);
         }
     });
-}
+};

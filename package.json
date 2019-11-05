@@ -26,16 +26,21 @@
         "jsonwebtoken": "^8.5.1",
         "mysql": "^2.17.1",
         "nodemailer": "^6.3.1",
+        "pm2": "^4.1.2",
         "reflect-metadata": "^0.1.10",
         "sqlite3": "^4.0.3",
         "ts-node-dev": "^1.0.0-pre.43",
+        "tslint": "^5.12.1",
         "typeorm": "0.2.20",
         "uuid": "^3.3.3"
     },
     "scripts": {
         "tsc": "tsc",
-        "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
-        "prod": "tsc && node ./build/app.js",
+        "lint": "tslint \"src/**/*.ts\"",
+        "build": "rimraf lib/ && npm run lint && tsc",
+        "start:dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
+        "start:prod": "tsc && node ./build/index.js",
+        "start:prod:pm2": "tsc && npx pm2 start pm2.yaml",
         "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
     }
 }

@@ -74,16 +74,17 @@ class AuthController {
         user.passwordResets = user.passwordResets ? [...user.passwordResets, passwordReset] : [passwordReset];
         await userRepository.save(user);
 
-        // send email
+        res.status(200).send({ success: true });
+
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
-            subject: subjectTemplates.PASSWORD_RESET,
-            body: bodyTemplates.PASSWORD_RESET.replace('{name}', user.firstName)
-                .replace('{url}', createPasswordResetUrl(token, user.id))
+            template: 'password-reset',
+            localValues: {
+                name: user.firstName,
+                url: createPasswordResetUrl(token, user.id)
+            }
         };
 
-        res.status(200).send({ success: true });
-        // TODO see to create thread or something
         sendEmail(emailOptions);
     }
 
@@ -157,9 +158,11 @@ class AuthController {
         // Send success email: password changed
         const emailOptions: EmailOptions = {
             destinationEmail: user.email,
-            subject: subjectTemplates.PASSWORD_RESET_SUCCESS,
-            body: bodyTemplates.PASSWORD_RESET_SUCCESS.replace('{name}', user.firstName)
-                .replace('{url}', `${process.env.APP_SERVER_URL}/password-reset`)
+            template: 'password-reset-success',
+            localValues: {
+                name: user.firstName,
+                url: `${process.env.APP_SERVER_URL}/password-reset`
+            }
         };
 
         sendEmail(emailOptions);

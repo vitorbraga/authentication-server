@@ -1,32 +1,51 @@
 import * as nodemailer from 'nodemailer';
+import Email = require('email-templates');
+
+const env = process.env.NODE_ENV || 'development';
 
 export interface EmailOptions {
     destinationEmail: string;
-    subject: string;
-    body: string;
+    template: string;
+    localValues: { [key: string]: string };
+    attachments?: { name: string; content: string; }[];
 }
 
-export const sendEmail = (emailOptions: EmailOptions) => {
-    const mailOptions = {
-        from: process.env.EMAIL_USERNAME,
-        to: emailOptions.destinationEmail,
-        subject: emailOptions.subject,
-        html: emailOptions.body
-    };
-
-    const transporter = nodemailer.createTransport({
+const createTransporter = () => {
+    return nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD
         }
     });
+};
 
-    transporter.sendMail(mailOptions, (err: any, info: any) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Email sent to ', emailOptions.destinationEmail);
-        }
+export const sendEmail = (emailOptions: EmailOptions) => {
+
+    const transporter = createTransporter();
+
+    const email = new Email({
+        message: {
+            from: process.env.EMAIL_USERNAME,
+            attachments: emailOptions.attachments
+        },
+        send: true,
+        transport: transporter,
+        subjectPrefix: env === 'production' ? false : `[${env.toUpperCase()}] `
     });
+
+    email
+        .send({
+            template: emailOptions.template,
+            message: {
+                to: emailOptions.destinationEmail
+            },
+            locals: emailOptions.localValues
+        })
+        .then((result) => {
+            console.log('Email sent to ', emailOptions.destinationEmail);
+        })
+        .catch((err) => {
+            console.error('Email not sent', err);
+        });
 };

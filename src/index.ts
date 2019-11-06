@@ -7,26 +7,26 @@ import * as cors from 'cors';
 import routes from './routes';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
-
-process.on('uncaughtException', (e) => {
-    console.log('uncaughtException', e);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (e) => {
-    console.log('unhandledRejection', e);
-    process.exit(1);
-});
-
-process.on('SIGINT', () => {
-    console.log('Received SIGINT, closing server.');
-    process.exit(1);
-});
-
 // Connects to the Database -> then starts the express
 createConnection()
     .then(async (connection) => {
+        dotenv.config();
+
+        process.on('uncaughtException', (e) => {
+            console.log('uncaughtException', e);
+            process.exit(1);
+        });
+
+        process.on('unhandledRejection', (e) => {
+            console.log('unhandledRejection', e);
+            process.exit(1);
+        });
+
+        process.on('SIGINT', () => {
+            console.log('Received SIGINT, closing server.');
+            process.exit(1);
+        });
+
         // Create a new express application instance
         const app = express();
 

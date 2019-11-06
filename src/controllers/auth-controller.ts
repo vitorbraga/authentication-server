@@ -7,7 +7,6 @@ import { User } from '../entity/User';
 import config from '../config/config';
 import { PasswordReset } from '../entity/PasswordReset';
 import { sendEmail, EmailOptions } from '../utils/email-sender';
-import { subjectTemplates, bodyTemplates } from '../utils/email-templates';
 import { encrypt, decrypt } from '../utils/encrypter';
 import { checkPasswordComplexity } from '../utils/validators';
 
@@ -63,6 +62,22 @@ class AuthController {
             user = await userRepository.findOneOrFail({ where: { email } });
         } catch (error) {
             res.status(401).send({ success: false, error: 'PASSWORD_RESET_USER_NOT_FOUND' });
+            return;
+        }
+
+        const passwordResetRepository = getRepository(PasswordReset);
+        const limitDate = Date.now() - PASSWORD_RESET_TOKEN_EXPIRATION_MS;
+
+        const result = await passwordResetRepository
+            .createQueryBuilder('passwordReset')
+            .select('passwordReset.id')
+            .andWhere('userId = :userId')
+            .andWhere('createdAt > :limitDate')
+            .setParameters({ userId: user.id, limitDate: new Date(limitDate) })
+            .getMany();
+
+        if (result.length > 0) {
+            res.status(401).send({ success: false, error: 'PASSWORD_RESET_ONGOING_RECOVERY_PROCESS' });
             return;
         }
 

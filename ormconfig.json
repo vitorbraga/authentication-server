@@ -4,10 +4,10 @@
    "synchronize": true,
    "logging": false,
    "entities": [
-      "build/entity/.js"
+      "build/entity/*.js"
    ],
    "migrations": [
-      "build/migration/.js"
+      "build/migration/*.js"
    ],
    "subscribers": [
       "build/subscriber/*.js"

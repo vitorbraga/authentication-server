@@ -1,32 +1,33 @@
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
+import { createConnection, ConnectionOptions } from 'typeorm';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as cors from 'cors';
 import routes from './routes';
 import * as dotenv from 'dotenv';
+import { getConnectionConfig } from './config/ormconfig';
 
-// Connects to the Database -> then starts the express
-createConnection()
+dotenv.config();
+
+process.on('uncaughtException', (e) => {
+    console.log('uncaughtException', e);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (e) => {
+    console.log('unhandledRejection', e);
+    process.exit(1);
+});
+
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, closing server.');
+    process.exit(1);
+});
+
+const connectionConfig = getConnectionConfig();
+createConnection(connectionConfig)
     .then(async (connection) => {
-        dotenv.config();
-
-        process.on('uncaughtException', (e) => {
-            console.log('uncaughtException', e);
-            process.exit(1);
-        });
-
-        process.on('unhandledRejection', (e) => {
-            console.log('unhandledRejection', e);
-            process.exit(1);
-        });
-
-        process.on('SIGINT', () => {
-            console.log('Received SIGINT, closing server.');
-            process.exit(1);
-        });
-
         // Create a new express application instance
         const app = express();
 

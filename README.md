@@ -18,3 +18,13 @@ With pm2:
 // "username": "vitorbraga",
 // "password": "TROCAR SENHA",
 // "database": "vitorbraga_auth",
+
+Development:
+TYPEORM_ENTITIES=src/entity/*.ts
+TYPEORM_MIGRATIONS=src/migration/*.ts
+TYPEORM_SUBSCRIBERS=src/subscriber/*.ts
+
+Production:
+TYPEORM_ENTITIES=build/entity/*.js
+TYPEORM_MIGRATIONS=build/migration/*.js
+TYPEORM_SUBSCRIBERS=build/subscriber/*.js

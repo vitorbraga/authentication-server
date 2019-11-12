@@ -69,43 +69,38 @@ class UserController {
         res.status(201).send({ success: true, user: newUser });
     }
 
-    static editUser = async (req: Request, res: Response) => {
+    static updateUser = async (req: Request, res: Response) => {
         // Get the ID from the url
         const id = req.params.id;
 
-        // Get values from the body
-        const { email, role } = req.body;
+        const { firstName, lastName } = req.body;
 
-        // Try to find user on database
         const userRepository = getRepository(User);
         let user;
         try {
             user = await userRepository.findOneOrFail(id);
         } catch (error) {
             // If not found, send a 404 response
-            res.status(404).send('User not found');
+            res.status(404).send({ success: false, error: 'UPDATE_USER_NOT_FOUND' });
             return;
         }
 
         // Validate the new values on model
-        user.email = email;
-        user.role = role;
+        user.firstName = firstName;
+        user.lastName = lastName;
+
         const errors = await validate(user);
         if (errors.length > 0) {
-            res.status(400).send(errors);
+            const fields = errors.map((item) => ({ field: item.property, constraints: item.constraints }));
+            res.status(400).send({ success: false, fields });
             return;
         }
 
-        // Try to safe, if fails, that means username already in use
-        try {
-            await userRepository.save(user);
-        } catch (e) {
-            res.status(409).send('email already in use');
-            return;
-        }
+        // Try to save, if fails, that means username already in use
+        const newUser = await userRepository.save(user);
+        delete newUser.password;
 
-        // After all send a 204 (no content, but accepted) response
-        res.status(204).send();
+        res.status(200).send({ success: true, user: newUser });
     }
 
     static deleteUser = async (req: Request, res: Response) => {

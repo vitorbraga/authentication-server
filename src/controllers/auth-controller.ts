@@ -160,7 +160,7 @@ class AuthController {
         user.password = newPassword;
         const errors = await validate(user);
         if (errors.length > 0) {
-            res.status(500).send({ success: false, error: 'UNEXPECTED_ERROR' });
+            res.status(500).send({ success: false, error: 'UNEXPECTED_ERROR' }); // FIXME user better message
             return;
         }
 
@@ -231,9 +231,9 @@ class AuthController {
         const id = res.locals.jwtPayload.userId;
 
         // Get parameters from the body
-        const { oldPassword, newPassword } = req.body;
-        if (!(oldPassword && newPassword)) {
-            res.status(400).send();
+        const { currentPassword, newPassword } = req.body;
+        if (!(currentPassword && newPassword)) {
+            res.status(400).send({ success: false, error: 'CHANGE_PASSWORD_MISSING_PASSWORDS' });
             return;
         }
 
@@ -243,13 +243,13 @@ class AuthController {
         try {
             user = await userRepository.findOneOrFail(id);
         } catch (id) {
-            res.status(401).send();
+            res.status(401).send({ success: false, error: 'CHANGE_PASSWORD_USER_NOT_FOUND' });
             return;
         }
 
         // Check if old password matchs
-        if (!user.checkIfUnencryptedPasswordIsValid(oldPassword)) {
-            res.status(401).send();
+        if (!user.checkIfUnencryptedPasswordIsValid(currentPassword)) {
+            res.status(401).send({ success: false, error: 'CHANGE_PASSWORD_INCORRECT_CURRENT_PASSWORD' });
             return;
         }
 
@@ -257,14 +257,16 @@ class AuthController {
         user.password = newPassword;
         const errors = await validate(user);
         if (errors.length > 0) {
-            res.status(400).send(errors);
+            res.status(400).send({ success: false, error: 'CHANGE_PASSWORD_PASSWORD_COMPLEXITY' });
             return;
         }
+
         // Hash the new password and save
         user.hashPassword();
-        userRepository.save(user);
+        const updatedUser = await userRepository.save(user);
+        delete updatedUser.password;
 
-        res.status(204).send();
+        res.status(200).send({ success: true, user: updatedUser });
     }
 }
 

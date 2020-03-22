@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { EmailOptions, sendEmail } from '../utils/email-sender';
 
-class TestController {
+export class TestController {
 
     static sendEmail = async (req: Request, res: Response) => {
         const emailOptions: EmailOptions = {
@@ -16,5 +16,3 @@ class TestController {
         sendEmail(emailOptions);
     }
 }
-
-export default TestController;

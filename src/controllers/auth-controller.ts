@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { validate } from 'class-validator';
 import * as uuidv4 from 'uuid/v4';
 import { User } from '../entity/User';
-import config from '../config/config';
+import { jwtConfig } from '../config/config';
 import { PasswordReset } from '../entity/PasswordReset';
 import { sendEmail, EmailOptions } from '../utils/email-sender';
 import { encrypt, decrypt } from '../utils/encrypter';
@@ -17,7 +17,7 @@ const createPasswordResetUrl = (token: string, userId: number): string => {
     return `${process.env.APP_SERVER_URL}/change-password?token=${token}&u=${encryptedUserId}`;
 };
 
-class AuthController {
+export class AuthController {
     static login = async (req: Request, res: Response) => {
         // Check if username and password are set
         const { username, password } = req.body;
@@ -42,8 +42,8 @@ class AuthController {
             return;
         }
 
-        // Sing JWT, valid for 2 hours
-        const token = jwt.sign({ userId: user.id, email: user.email }, config.jwtSecret, { expiresIn: '2h' });
+        // Sign JWT, valid for 2 hours
+        const token = jwt.sign({ userId: user.id, email: user.email }, jwtConfig.secret, { expiresIn: '2h' });
 
         // Send the jwt in the response
         res.send({ success: true, jwt: token });
@@ -269,5 +269,3 @@ class AuthController {
         res.status(200).send({ success: true, user: updatedUser });
     }
 }
-
-export default AuthController;

@@ -1,1 +1,1 @@
-export default { jwtSecret: '@QEGTUI' };
+export const jwtConfig = { secret: '@QEGTUI' };

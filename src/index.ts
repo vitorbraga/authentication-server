@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { createConnection, ConnectionOptions } from 'typeorm';
+import { createConnection } from 'typeorm';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as cors from 'cors';
-import routes from './routes';
+import { routes } from './routes';
 import * as dotenv from 'dotenv';
 import { getConnectionConfig } from './config/ormconfig';
 

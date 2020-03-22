@@ -1,12 +1,10 @@
-import { Router, Request, Response } from 'express';
-import auth from './auth';
-import user from './user';
-import test from './test';
+import { Router } from 'express';
+import { authRouter } from './auth';
+import { userRouter } from './user';
+import { testRouter } from './test';
 
-const routes = Router();
+export const routes = Router();
 
-routes.use('/auth', auth);
-routes.use('/user', user);
-routes.use('/test', test);
-
-export default routes;
+routes.use('/auth', authRouter);
+routes.use('/user', userRouter);
+routes.use('/test', testRouter);

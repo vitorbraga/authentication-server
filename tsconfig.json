@@ -12,7 +12,8 @@
         "experimentalDecorators": true,
         "strictNullChecks": true,
         "sourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "noUnusedLocals": true
     },
     "include": [
         "src/**/*"

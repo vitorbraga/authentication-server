@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import TestController from '../controllers/test-controller';
+import { TestController } from '../controllers/test-controller';
 
-const router = Router();
+export const testRouter = Router();
 
-router.get('/send-email', TestController.sendEmail);
-
-export default router;
+testRouter.get('/send-email', TestController.sendEmail);

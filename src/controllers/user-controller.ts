@@ -4,7 +4,7 @@ import { validate, ValidationError } from 'class-validator';
 
 import { User } from '../entity/User';
 
-class UserController {
+export class UserController {
 
     static listAll = async (req: Request, res: Response) => {
         // Get users from database
@@ -108,9 +108,8 @@ class UserController {
         const id = req.params.id;
 
         const userRepository = getRepository(User);
-        let user: User;
         try {
-            user = await userRepository.findOneOrFail(id);
+            await userRepository.findOneOrFail(id);
         } catch (error) {
             res.status(404).send('User not found');
             return;
@@ -121,5 +120,3 @@ class UserController {
         res.status(204).send();
     }
 }
-
-export default UserController;

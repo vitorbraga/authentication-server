@@ -6,7 +6,7 @@ import { User } from '../entity/User';
 
 export class UserController {
 
-    static listAll = async (req: Request, res: Response) => {
+    public static listAll = async (req: Request, res: Response) => {
         // Get users from database
         const userRepository = getRepository(User);
         const users = await userRepository.find({
@@ -17,7 +17,7 @@ export class UserController {
         res.send(users);
     }
 
-    static getOneById = async (req: Request, res: Response) => {
+    public static getOneById = async (req: Request, res: Response) => {
         // Get the ID from the url
         const id: number = parseInt(req.params.id, 10);
 
@@ -33,7 +33,7 @@ export class UserController {
         }
     }
 
-    static newUser = async (req: Request, res: Response) => {
+    public static newUser = async (req: Request, res: Response) => {
         // Get parameters from the body
         const { email, password, firstName, lastName } = req.body;
         const user = new User();
@@ -60,7 +60,7 @@ export class UserController {
         try {
             newUser = await userRepository.save(user);
         } catch (e) {
-            res.status(409).send({ success: false, error: 'Email already in use' });
+            res.status(409).send({ success: false, error: 'REGISTER_EMAIL_IN_USE' });
             return;
         }
 
@@ -69,7 +69,7 @@ export class UserController {
         res.status(201).send({ success: true, user: newUser });
     }
 
-    static updateUser = async (req: Request, res: Response) => {
+    public static updateUser = async (req: Request, res: Response) => {
         // Get the ID from the url
         const id = req.params.id;
 
@@ -103,8 +103,7 @@ export class UserController {
         res.status(200).send({ success: true, user: newUser });
     }
 
-    static deleteUser = async (req: Request, res: Response) => {
-        // Get the ID from the url
+    public static deleteUser = async (req: Request, res: Response) => {
         const id = req.params.id;
 
         const userRepository = getRepository(User);

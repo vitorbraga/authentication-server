@@ -18,7 +18,7 @@ const createPasswordResetUrl = (token: string, userId: number): string => {
 };
 
 export class AuthController {
-    static login = async (req: Request, res: Response) => {
+    public static login = async (req: Request, res: Response) => {
         // Check if username and password are set
         const { username, password } = req.body;
         if (!(username && password)) {
@@ -49,7 +49,7 @@ export class AuthController {
         res.send({ success: true, jwt: token });
     }
 
-    static passwordRecoveryProcess = async (req: Request, res: Response) => {
+    public static passwordRecoveryProcess = async (req: Request, res: Response) => {
         const { email } = req.body;
         if (!email) {
             res.status(400).send({ success: false, error: 'PASSWORD_RESET_MISSING_EMAIL' });
@@ -103,7 +103,7 @@ export class AuthController {
         sendEmail(emailOptions);
     }
 
-    static resetPassword = async (req: Request, res: Response) => {
+    public static resetPassword = async (req: Request, res: Response) => {
         const { newPassword, token, userId: encryptedUserId } = req.body;
         if (!(newPassword && token && encryptedUserId)) {
             res.status(400).send({ success: false, error: 'RESET_MISSING_DATA' });
@@ -183,7 +183,7 @@ export class AuthController {
         sendEmail(emailOptions);
     }
 
-    static checkPasswordToken = async (req: Request, res: Response) => {
+    public static checkPasswordToken = async (req: Request, res: Response) => {
         const { token, userId: encryptedUserId } = req.params;
         if (!token) {
             res.status(400).send({ success: false, error: 'PASSWORD_TOKEN_REQUIRED' });
@@ -226,7 +226,7 @@ export class AuthController {
         res.status(200).send({ success: true });
     }
 
-    static changePassword = async (req: Request, res: Response) => {
+    public static changePassword = async (req: Request, res: Response) => {
         // Get ID from JWT
         const id = res.locals.jwtPayload.userId;
 

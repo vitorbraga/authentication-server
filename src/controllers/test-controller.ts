@@ -3,7 +3,7 @@ import { EmailOptions, sendEmail } from '../utils/email-sender';
 
 export class TestController {
 
-    static sendEmail = async (req: Request, res: Response) => {
+    public static sendEmail = async (req: Request, res: Response) => {
         const emailOptions: EmailOptions = {
             template: 'password-reset-success',
             destinationEmail: 'vitor.braga7@gmail.com',

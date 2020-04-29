@@ -47,7 +47,7 @@ export class AuthController {
 
         // Send the jwt in the response
         res.send({ success: true, jwt: token });
-    }
+    };
 
     public static passwordRecoveryProcess = async (req: Request, res: Response) => {
         const { email } = req.body;
@@ -101,7 +101,7 @@ export class AuthController {
         };
 
         sendEmail(emailOptions);
-    }
+    };
 
     public static resetPassword = async (req: Request, res: Response) => {
         const { newPassword, token, userId: encryptedUserId } = req.body;
@@ -181,7 +181,7 @@ export class AuthController {
         };
 
         sendEmail(emailOptions);
-    }
+    };
 
     public static checkPasswordToken = async (req: Request, res: Response) => {
         const { token, userId: encryptedUserId } = req.params;
@@ -224,7 +224,7 @@ export class AuthController {
         }
 
         res.status(200).send({ success: true });
-    }
+    };
 
     public static changePassword = async (req: Request, res: Response) => {
         // Get ID from JWT
@@ -267,5 +267,5 @@ export class AuthController {
         delete updatedUser.password;
 
         res.status(200).send({ success: true, user: updatedUser });
-    }
+    };
 }

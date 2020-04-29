@@ -5,9 +5,6 @@
     "devDependencies": {
         "ts-node": "3.3.0",
         "@types/node": "^8.0.29",
-        "typescript": "3.3.3333"
-    },
-    "dependencies": {
         "@types/bcryptjs": "^2.4.2",
         "@types/body-parser": "^1.17.1",
         "@types/cors": "^2.8.6",
@@ -16,7 +13,19 @@
         "@types/helmet": "0.0.45",
         "@types/jsonwebtoken": "^8.3.5",
         "@types/nodemailer": "^6.2.2",
+        "@typescript-eslint/eslint-plugin": "^2.24.0",
+        "@typescript-eslint/parser": "^2.24.0",
         "@types/uuid": "^3.4.6",
+        "typescript": "3.3.3333",
+        "eslint": "^6.7.1",
+        "eslint-config-standard": "^14.1.0",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-node": "^10.0.0",
+        "eslint-plugin-prefer-arrow": "^1.1.6",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1"
+    },
+    "dependencies": {
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.18.1",
         "class-validator": "^0.10.2",
@@ -39,7 +48,7 @@
     },
     "scripts": {
         "tsc": "tsc",
-        "lint": "tslint \"src/**/*.ts\"",
+        "lint": "eslint \"src/**/*.ts\"",
         "build": "rimraf lib/ && npm run lint && tsc",
         "start:dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
         "start:prod": "tsc && node ./build/index.js",

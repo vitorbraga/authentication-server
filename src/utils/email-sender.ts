@@ -7,7 +7,7 @@ export interface EmailOptions {
     destinationEmail: string;
     template: string;
     localValues: { [key: string]: string };
-    attachments?: { name: string; content: string; }[];
+    attachments?: { name: string, content: string }[];
 }
 
 const createTransporter = () => {
@@ -21,7 +21,6 @@ const createTransporter = () => {
 };
 
 export const sendEmail = (emailOptions: EmailOptions) => {
-
     const transporter = createTransporter();
 
     const email = new Email({

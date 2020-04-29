@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { EmailOptions, sendEmail } from '../utils/email-sender';
 
 export class TestController {
-
     public static sendEmail = async (req: Request, res: Response) => {
         const emailOptions: EmailOptions = {
             template: 'password-reset-success',
@@ -14,5 +13,5 @@ export class TestController {
         };
         res.status(200).send({ message: 'Email sent' });
         sendEmail(emailOptions);
-    }
+    };
 }

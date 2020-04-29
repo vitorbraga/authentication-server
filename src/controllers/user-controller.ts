@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { validate, ValidationError } from 'class-validator';
-
 import { User } from '../entity/User';
 
 export class UserController {
-
     public static listAll = async (req: Request, res: Response) => {
         // Get users from database
         const userRepository = getRepository(User);
@@ -15,23 +13,25 @@ export class UserController {
 
         // Send the users object
         res.send(users);
-    }
+    };
 
-    public static getOneById = async (req: Request, res: Response) => {
-        // Get the ID from the url
-        const id: number = parseInt(req.params.id, 10);
+    public static getUserById = async (req: Request, res: Response) => {
+        if (!req.params.id) {
+            res.status(422).json({ success: false, error: 'MISSING_USER_ID' });
+        }
+        const userId: number = parseInt(req.params.id, 10);
 
-        // Get the user from database
         const userRepository = getRepository(User);
+
         try {
-            const user = await userRepository.findOneOrFail(id, {
+            const user = await userRepository.findOneOrFail(userId, {
                 select: ['id', 'email', 'firstName', 'lastName', 'role', 'createdAt', 'updatedAt']
             });
             res.json({ success: true, user });
         } catch (error) {
             res.status(404).send({ success: false, error: 'USER_NOT_FOUND' });
         }
-    }
+    };
 
     public static newUser = async (req: Request, res: Response) => {
         // Get parameters from the body
@@ -67,7 +67,7 @@ export class UserController {
         // If all ok, send 201 response
         delete newUser.password;
         res.status(201).send({ success: true, user: newUser });
-    }
+    };
 
     public static updateUser = async (req: Request, res: Response) => {
         // Get the ID from the url
@@ -101,7 +101,7 @@ export class UserController {
         delete newUser.password;
 
         res.status(200).send({ success: true, user: newUser });
-    }
+    };
 
     public static deleteUser = async (req: Request, res: Response) => {
         const id = req.params.id;
@@ -117,5 +117,5 @@ export class UserController {
 
         // After all send a 204 (no content, but accepted) response
         res.status(204).send();
-    }
+    };
 }

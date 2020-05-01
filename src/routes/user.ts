@@ -9,7 +9,7 @@ export const userRouter = Router();
 userRouter.get('/', [checkJwt, checkRole(['ADMIN'])], UserController.listAll);
 
 // Get one user
-userRouter.get('/:id([0-9]+)', [checkJwt, checkRole(['ADMIN', 'USER'])], UserController.getOneById);
+userRouter.get('/:id([0-9]+)', [checkJwt, checkRole(['ADMIN', 'USER'])], UserController.getUserById);
 
 // Create a new user
 userRouter.post('/', UserController.newUser);

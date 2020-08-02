@@ -2,12 +2,14 @@ import { ConnectionOptions } from 'typeorm';
 
 export const getConnectionConfig = (): ConnectionOptions => {
     return {
-        type: 'mysql',
-        host: process.env.TYPEORM_HOST,
-        port: 3306,
-        username: process.env.TYPEORM_USERNAME,
-        password: process.env.TYPEORM_PASSWORD,
-        database: process.env.TYPEORM_DATABASE,
+        type: 'sqlite',
+        database: 'database.sqlite',
+        // type: 'mysql',
+        // host: process.env.TYPEORM_HOST,
+        // port: 3306,
+        // username: process.env.TYPEORM_USERNAME,
+        // password: process.env.TYPEORM_PASSWORD,
+        // database: process.env.TYPEORM_DATABASE,
         synchronize: true,
         logging: false,
         entities: [
@@ -26,25 +28,3 @@ export const getConnectionConfig = (): ConnectionOptions => {
         }
     };
 };
-
-// export default databaseConfig;
-// {
-//    'type': 'sqlite',
-//    'database': 'database.sqlite',
-//    'synchronize': true,
-//    'logging': false,
-//    'entities': [
-//       'build/entity/*.js'
-//    ],
-//    'migrations': [
-//       'build/migration/*.js'
-//    ],
-//    'subscribers': [
-//       'build/subscriber/*.js'
-//    ],
-//    'cli': {
-//       'entitiesDir': 'src/entity',
-//       'migrationsDir': 'src/migration',
-//       'subscribersDir': 'src/subscriber'
-//    }
-// }

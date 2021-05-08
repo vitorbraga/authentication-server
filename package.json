@@ -43,7 +43,7 @@
         "sqlite3": "^4.0.3",
         "ts-node-dev": "^1.0.0-pre.43",
         "tslint": "^5.12.1",
-        "typeorm": "0.2.20",
+        "typeorm": "0.2.25",
         "uuid": "^3.3.3"
     },
     "scripts": {
